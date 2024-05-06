@@ -8,6 +8,7 @@ const flash = require('connect-flash');
 const FileStore = require('session-file-store')(session);
 const csurf = require('csurf');
 require('dotenv').config();
+const cors = require('cors')
 
 const app = express();
 
@@ -28,6 +29,7 @@ app.use(
     })
 );
 
+app.use(cors());
 // enable sessions
 // req.session is only available after you enable sessions
 app.use(session({
