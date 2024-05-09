@@ -45,6 +45,8 @@ router.post('/register', function (req, res) {
     })
 })
 
+
+
 router.get('/login', function (req, res) {
     const loginForm = createLoginForm();
     res.render('users/login', {
@@ -81,14 +83,14 @@ router.post('/login', function (req, res) {
                     res.redirect('/products')
                 } else {
                     req.flash('error_messages', "Invalid authentication");
-                    res.status(401);
+                    //res.status(401);
                     res.redirect("/users/login");
                 }
 
 
             } else {
                 req.flash('error_messages', "Invalid authentication");
-                res.status(401);
+                //res.status(401);
                 res.redirect('/users/login');
             }
 

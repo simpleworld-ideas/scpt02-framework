@@ -15,12 +15,13 @@ exports.setup = function(options, seedLink) {
 };
 
 exports.up = function(db) {
-  return db.createTable('users', {
-    id: { type: 'int', primaryKey: true, unsigned: true, autoIncrement: true},
-    username: { type: 'string', length: 100, notNull: true},
-    email: {type: 'string', length: 320},
-    password: {type: 'string', length: 80}
-  });
+  return db.createTable('users',{
+    id: { type: 'int', primaryKey:true, unsigned: true, autoIncrement:true},
+    username: { type: 'string', length:100},
+    email: {type: 'string', length:320},
+    password: {type: 'string', length:80}
+})
+
 };
 
 exports.down = function(db) {

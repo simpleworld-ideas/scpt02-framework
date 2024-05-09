@@ -1,4 +1,3 @@
-// setup express
 const express = require('express');
 const hbs = require('hbs');
 const wax = require('wax-on');
@@ -8,7 +7,9 @@ const flash = require('connect-flash');
 const FileStore = require('session-file-store')(session);
 const csurf = require('csurf');
 require('dotenv').config();
-const cors = require('cors')
+
+
+
 
 const app = express();
 
@@ -29,7 +30,8 @@ app.use(
     })
 );
 
-app.use(cors());
+
+
 // enable sessions
 // req.session is only available after you enable sessions
 app.use(session({
@@ -61,12 +63,24 @@ app.use(function(req,res,next){
 
 // enable csurf for CSRF protection after sessions are enabled
 // because csurf requires sessions to work
-app.use(csurf());
+const csurfInstance = csurf();
+
+// for csrf protection exclusion
+app.use(function(req,res,next){
+    // check if the request is  meant for the webhook
+    if (req.url === "/checkout/process_payment" || req.url.slice(0, 5) == '/api/') {
+        // exclude from CSRF protection
+        return next();
+    } 
+    csurfInstance(req,res,next);
+})
 
 // middleware to share the CSRF token with all hbs files
 app.use(function(req,res,next){
     // req.csrfToken() is available because of `app.use(csurf())`
-    res.locals.csrfToken = req.csrfToken();
+    if (req.csrfToken) {
+        res.locals.csrfToken = req.csrfToken();
+    }
     next();
 })
 
@@ -85,11 +99,17 @@ app.use(function(err, req, res, next){
 
 async function main() {
     // routes will be inside here
+    
     const landingRoutes = require('./routes/landing');
     const productRoutes = require('./routes/products');
     const userRoutes = require('./routes/users');
     const cloudinaryRoutes = require('./routes/cloudinary');
     const shoppingCartRoutes = require('./routes/shoppingCart');
+    const checkoutRoutes = require('./routes/checkout')
+
+    const api = {
+        products: require('./routes/api/products')
+    }
 
     // use the landing routes
     app.use('/', landingRoutes);
@@ -97,6 +117,10 @@ async function main() {
     app.use('/users', userRoutes);
     app.use('/cloudinary', cloudinaryRoutes);
     app.use('/cart', shoppingCartRoutes);
+    app.use('/checkout', checkoutRoutes);
+
+    // for RESTFul API endpoints
+    app.use('/api/products',  express.json(), api.products);
 
   
 }
